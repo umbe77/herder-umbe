@@ -1,8 +1,9 @@
 # herder-choose-projects
 
-Four Herdr mods: a fuzzy project picker for the folders directly inside your
+Five Herdr mods: a fuzzy project picker for the folders directly inside your
 projects folder (`~/develop` by default), a prompt that creates a new project
-there, a fuzzy switcher for the spaces you have open, and a settings popup.
+there, a fuzzy switcher for the spaces you have open, a settings popup, and a
+tmux-style copy mode with vi keys.
 
 ## What it does
 
@@ -39,6 +40,26 @@ there, a fuzzy switcher for the spaces you have open, and a settings popup.
   can still be saved.
 - Herdr's command palette (`ctrl-shift-p`) only lists Herdr's own commands, so
   this popup can only be opened with its key binding.
+
+### `copy-mode` (`alt-c`)
+
+tmux `mode-keys vi` copy mode for the focused terminal. A small `-- COPY --` pill
+appears at the top and takes the keyboard; the terminal's selection is the cursor
+and starts at the program's cursor. Moving past the top or bottom scrolls the history.
+
+| Keys | Action |
+|---|---|
+| `h` `j` `k` `l`, arrows | move |
+| `0` / `^` / `$` | start / start / end of line |
+| `g` / `G` | top of history / bottom |
+| `ctrl-u` `ctrl-b` / `ctrl-d` `ctrl-f`, PgUp / PgDn | page up / down |
+| `ctrl-y` / `ctrl-e` | line up / down |
+| `v` / `space`, `V` | start a selection, line selection (again: back to cursor) |
+| `y` / `Enter` | copy the selection to the clipboard and leave |
+| `q` / `Esc` / `ctrl-c` | leave without copying |
+
+A count before a motion repeats it (`5j`). Word motions (`w` `b` `e`) and search
+aren't available: Herdr only exposes cell, line and page moves for the selection.
 
 ### Tab navigation
 
@@ -96,6 +117,7 @@ The bindings it adds (under `global`):
 "alt-n": "mod.open:new-project",
 "alt-s": "mod.open:switch-space",
 "alt-,": "mod.open:umbe-settings",
+"alt-c": "mod.open:copy-mode",
 "shift-left": "tab.prev",
 "shift-right": "tab.next"
 ```

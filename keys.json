@@ -5,6 +5,7 @@
     "alt-s": "mod.open:switch-space",
     "alt-,": "mod.open:umbe-settings",
     "shift-left": "tab.prev",
-    "shift-right": "tab.next"
+    "shift-right": "tab.next",
+    "alt-c": "mod.open:copy-mode"
   }
 }
