@@ -1,0 +1,10 @@
+{
+  "global": {
+    "alt-o": "mod.open:choose-projects",
+    "alt-n": "mod.open:new-project",
+    "alt-s": "mod.open:switch-space",
+    "alt-,": "mod.open:umbe-settings",
+    "shift-left": "tab.prev",
+    "shift-right": "tab.next"
+  }
+}
