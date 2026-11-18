@@ -1,13 +1,14 @@
 // Choose a project from the projects folder (~/develop unless config.json says
 // otherwise, see config.js). On Enter: a space named after the folder,
-// with an "IDE" tab running `nvim .`, a "Terminal" tab with a shell and a
-// "Claude" tab running `claude`. The IDE tab stays active.
+// with an "IDE" tab running `nvim .`, a "Terminal" tab with a shell and an
+// agent tab running `agent_cmd` (`claude` by default, tab named after the
+// command). The IDE tab stays active.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, ScrollHandle } from "gpui-base";
 import { props, closeOverlay, run, spaces, theme, notify } from "herdr";
 
-import { loadConfig, listDirs, tildify, DEFAULT_PROJECTS_DIR } from "./config.js";
+import { loadConfig, agentArgv, agentTabName, DEFAULT_AGENT_CMD, listDirs, tildify, DEFAULT_PROJECTS_DIR } from "./config.js";
 
 // Subsequence match, ranked: word starts and runs of adjacent letters win.
 function fuzzy(query, name) {
@@ -32,6 +33,7 @@ function fuzzy(query, name) {
 export default class ChooseProjects extends View {
   init(_props, cx) {
     this.root = DEFAULT_PROJECTS_DIR;
+    this.agentCmd = DEFAULT_AGENT_CMD;
     this.dirs = [];
     this.query = "";
     this.at = 0;
@@ -59,6 +61,7 @@ export default class ChooseProjects extends View {
     cx.spawn(async (cx) => {
       const config = await loadConfig();
       this.root = config.projectsDir;
+      this.agentCmd = config.agentCmd;
       if (config.warning) notify({ title: "Choose project", body: config.warning, level: "warning" });
       try {
         this.dirs = await listDirs(this.root);
@@ -121,9 +124,9 @@ export default class ChooseProjects extends View {
       });
       run("tab.new", {
         space: space.id,
-        name: "Claude",
+        name: agentTabName(this.agentCmd),
         folder: pending.folder,
-        argv: ["claude"],
+        argv: agentArgv(this.agentCmd),
         focus: false,
       });
       this.pending = null;

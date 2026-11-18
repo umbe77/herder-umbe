@@ -8,6 +8,7 @@
 import { home, exec, readTextFile } from "herdr";
 
 export const DEFAULT_PROJECTS_DIR_RAW = "~/develop";
+export const DEFAULT_AGENT_CMD = "claude";
 
 function homeDir() {
   return home().replace(/\\/g, "/").replace(/\/+$/, "");
@@ -48,7 +49,8 @@ export async function configPath() {
 }
 
 // Never throws. `raw` is the parsed JSON object (or {}), `projectsDirRaw` the
-// value as written (e.g. "~/develop"), `projectsDir` the expanded path.
+// value as written (e.g. "~/develop"), `projectsDir` the expanded path,
+// `agentCmd` the command for the agent tab ("claude" by default).
 export async function loadConfig() {
   const path = await configPath();
   const fallback = (warning) => ({
@@ -56,6 +58,7 @@ export async function loadConfig() {
     raw: {},
     projectsDirRaw: DEFAULT_PROJECTS_DIR_RAW,
     projectsDir: DEFAULT_PROJECTS_DIR,
+    agentCmd: DEFAULT_AGENT_CMD,
     warning,
   });
 
@@ -86,11 +89,33 @@ export async function loadConfig() {
     return fallback(`${tildify(path)} must contain a JSON object, using ${DEFAULT_PROJECTS_DIR_RAW}`);
   }
 
-  const value = raw.projects_dir;
-  if (typeof value === "string" && value.trim()) {
-    return { path, raw, projectsDirRaw: value.trim(), projectsDir: expandHome(value), warning: "" };
+  const config = { ...fallback(""), raw };
+  const dir = raw.projects_dir;
+  if (typeof dir === "string" && dir.trim()) {
+    config.projectsDirRaw = dir.trim();
+    config.projectsDir = expandHome(dir);
   }
-  return { ...fallback(""), raw };
+  const agent = raw.agent_cmd;
+  if (typeof agent === "string" && agent.trim()) config.agentCmd = agent.trim();
+  return config;
+}
+
+// argv for the agent tab. Anything beyond a bare word goes through `sh -c` so
+// quoting, flags and VAR=value prefixes work; `exec` keeps the agent as the
+// tab's process.
+export function agentArgv(cmd) {
+  const c = String(cmd ?? "").trim() || DEFAULT_AGENT_CMD;
+  if (/^[\w./-]+$/.test(c)) return [c];
+  return ["sh", "-c", `exec ${c}`];
+}
+
+// Tab name for the agent: basename of the command, capitalised
+// ("codex --full-auto" -> "Codex", "/usr/bin/aider" -> "Aider").
+export function agentTabName(cmd) {
+  const words = String(cmd ?? "").trim().split(/\s+/).filter(Boolean);
+  const word = words.find((w) => !/^[A-Za-z_][A-Za-z0-9_]*=/.test(w)) ?? "";
+  const base = word.replace(/^["']|["']$/g, "").split("/").pop();
+  return base ? base[0].toUpperCase() + base.slice(1) : "Agent";
 }
 
 // Writes the whole object as pretty JSON, creating the folder if needed.

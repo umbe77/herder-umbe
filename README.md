@@ -14,7 +14,8 @@ there, a fuzzy switcher for the spaces you have open, and a settings popup.
 - Choosing a folder creates a space named after it, with three tabs:
   - `IDE` — runs `nvim .`
   - `Terminal` — your default shell
-  - `Claude` — runs `claude`
+  - an agent tab — runs `agent_cmd` (`claude` by default) and is named after
+    the command (`Claude`, `Codex`, …)
 - All tabs start in the chosen folder; the `IDE` tab is the active one.
 
 ### `new-project` (`alt-n`)
@@ -23,7 +24,7 @@ there, a fuzzy switcher for the spaces you have open, and a settings popup.
 - The name must not be empty, contain spaces, `/` or `\`, or start with a dot,
   and `<projects folder>/<name>` must not exist yet.
 - Creates `<projects folder>/<name>`, then opens it exactly like `choose-projects`:
-  a space with `IDE` (active), `Terminal` and `Claude` tabs.
+  a space with `IDE` (active), `Terminal` and agent tabs.
 
 ### `switch-space` (`alt-s`)
 
@@ -33,8 +34,8 @@ there, a fuzzy switcher for the spaces you have open, and a settings popup.
 
 ### `umbe-settings` (`alt-,`)
 
-- Edit the projects folder and press `Enter` to save it to the config file
-  (`Esc` closes). `~` is allowed. A folder that doesn't exist yet is flagged but
+- Edit the projects folder and the agent command, then press `Enter` to save
+  them to the config file (`Esc` closes). `~` is allowed. A folder that doesn't exist yet is flagged but
   can still be saved.
 - Herdr's command palette (`ctrl-shift-p`) only lists Herdr's own commands, so
   this popup can only be opened with its key binding.
@@ -50,14 +51,20 @@ The mods read `$XDG_CONFIG_HOME/herdr-umbe/config.json`
 
 ```json
 {
-  "projects_dir": "~/develop"
+  "projects_dir": "~/develop",
+  "agent_cmd": "claude"
 }
 ```
 
 - `projects_dir` — the folder whose subfolders `choose-projects` lists and where
   `new-project` creates projects. `~` is expanded. Defaults to `~/develop` when
   the file or the key is missing (an invalid file also falls back, with a warning).
-- Edit it by hand or with `alt-,`. Changes apply the next time a popup opens.
+- `agent_cmd` — the command run in the third tab that `choose-projects` and
+  `new-project` open (e.g. `codex`, `aider --model sonnet`). A command with
+  arguments runs through `sh -c`, so quoting and `VAR=value` prefixes work. The
+  tab is named after the command. Defaults to `claude` when the key is
+  missing or empty.
+- Edit them by hand or with `alt-,`. Changes apply the next time a popup opens.
 
 The helper that reads it lives in `mods/umbe-settings/config.js`. Each mod keeps
 its own copy, because mods are installed one folder at a time. After editing it,

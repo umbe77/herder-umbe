@@ -1,14 +1,14 @@
 // Create a new project in the projects folder (~/develop unless config.json
 // says otherwise, see config.js). Asks for a name, creates the folder, then
 // opens it like choose-projects: a space named after the folder, with an "IDE"
-// tab running `nvim .`, a "Terminal" tab with a shell and a "Claude" tab
-// running `claude`. The IDE tab stays active.
+// tab running `nvim .`, a "Terminal" tab with a shell and an agent tab running
+// `agent_cmd` (`claude` by default). The IDE tab stays active.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { props, closeOverlay, run, spaces, theme, notify, exec } from "herdr";
 
-import { loadConfig, pathExists, tildify, DEFAULT_PROJECTS_DIR } from "./config.js";
+import { loadConfig, agentArgv, agentTabName, DEFAULT_AGENT_CMD, pathExists, tildify, DEFAULT_PROJECTS_DIR } from "./config.js";
 
 // Returns an error message, or "" when the name can be used as a folder.
 function validate(name) {
@@ -22,10 +22,12 @@ function validate(name) {
 export default class NewProject extends View {
   init(_props, cx) {
     this.root = DEFAULT_PROJECTS_DIR;
+    this.agentCmd = DEFAULT_AGENT_CMD;
     this.configReady = new Promise((resolve) => {
       cx.spawn(async (cx) => {
         const config = await loadConfig();
         this.root = config.projectsDir;
+        this.agentCmd = config.agentCmd;
         if (config.warning) notify({ title: "New project", body: config.warning, level: "warning" });
         cx.notify();
         resolve();
@@ -124,9 +126,9 @@ export default class NewProject extends View {
       });
       run("tab.new", {
         space: space.id,
-        name: "Claude",
+        name: agentTabName(this.agentCmd),
         folder: pending.folder,
-        argv: ["claude"],
+        argv: agentArgv(this.agentCmd),
         focus: false,
       });
       this.pending = null;

@@ -1,11 +1,11 @@
-// Settings for the herdr-umbe mods. For now: the projects folder that
-// choose-projects (alt-o) and new-project (alt-n) use. Saved to
+// Settings for the herdr-umbe mods: the projects folder and the agent command
+// that choose-projects (alt-o) and new-project (alt-n) use. Saved to
 // $XDG_CONFIG_HOME/herdr-umbe/config.json (~/.config/herdr-umbe/config.json).
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { props, closeOverlay, theme, notify } from "herdr";
-import { loadConfig, saveConfig, pathExists, expandHome, tildify, DEFAULT_PROJECTS_DIR_RAW } from "./config.js";
+import { loadConfig, saveConfig, pathExists, expandHome, tildify, DEFAULT_PROJECTS_DIR_RAW, DEFAULT_AGENT_CMD } from "./config.js";
 
 export default class UmbeSettings extends View {
   init(_props, cx) {
@@ -28,6 +28,18 @@ export default class UmbeSettings extends View {
     });
     this.input.on("submit", (_e, cx) => this.save(cx));
 
+    this.agentInput = InputState.new({ placeholder: DEFAULT_AGENT_CMD });
+    this.agentInput.on("change", (_e, cx) => {
+      this.error = "";
+      cx.notify();
+    });
+    this.agentInput.on("submit", (_e, cx) => this.save(cx));
+
+    // Which field holds the keyboard, so Tab / Shift-Tab can switch to the other.
+    this.focused = this.input;
+    this.input.on("focus", () => (this.focused = this.input));
+    this.agentInput.on("focus", () => (this.focused = this.agentInput));
+
     this.handle = cx.focus_handle();
     this.handle.focus();
     this.input.focus();
@@ -40,6 +52,7 @@ export default class UmbeSettings extends View {
       this.warning = config.warning;
       this.value = config.projectsDirRaw;
       this.input.set_value(this.value);
+      this.agentInput.set_value(config.agentCmd);
       this.loading = false;
       this.check(cx);
       cx.notify();
@@ -85,7 +98,11 @@ export default class UmbeSettings extends View {
 
     cx.spawn(async (cx) => {
       try {
-        const path = await saveConfig({ ...this.raw, projects_dir: value });
+        const agent = this.agentInput.value().trim();
+        const next = { ...this.raw, projects_dir: value, agent_cmd: agent };
+        // Empty means "use the default", so drop the key.
+        if (!agent) delete next.agent_cmd;
+        const path = await saveConfig(next);
         notify({ title: "herdr-umbe settings", body: `Saved to ${tildify(path)}`, level: "success" });
         this.close();
       } catch (error) {
@@ -101,6 +118,12 @@ export default class UmbeSettings extends View {
     if (event.key === "escape") {
       cx.stop_propagation();
       this.close();
+    } else if (event.key === "tab") {
+      // Only two fields, so Tab and Shift-Tab both go to the other one.
+      cx.stop_propagation();
+      this.focused = this.focused === this.input ? this.agentInput : this.input;
+      this.focused.focus();
+      cx.notify();
     }
   }
 
@@ -170,6 +193,21 @@ export default class UmbeSettings extends View {
           .child(div().text_color(t.dim).child("▸"))
           .child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground)),
       )
+      .child(div().flex_none().text_size(12).text_color(t.dim).child("Agent command (third tab of Choose project and New project)"))
+      .child(
+        h_flex()
+          .h(36)
+          .flex_none()
+          .px(10)
+          .gap(8)
+          .items_center()
+          .rounded(9)
+          .border(1)
+          .border_color(t.accent)
+          .bg(t.background)
+          .child(div().text_color(t.dim).child("$"))
+          .child(Input.new(this.agentInput).flex_1().h_full().text_size(12.8).text_color(t.foreground)),
+      )
       .child(
         h_flex()
           .flex_none()
@@ -186,7 +224,7 @@ export default class UmbeSettings extends View {
               .when(strong, (el) => el.text_color(t.foreground))
               .child(status),
           )
-          .child(div().flex_none().child("↵ save  Esc close")),
+          .child(div().flex_none().child("Tab next  ↵ save  Esc close")),
       );
   }
 }
