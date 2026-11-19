@@ -50,6 +50,7 @@ and starts at the program's cursor. Moving past the top or bottom scrolls the hi
 | Keys | Action |
 |---|---|
 | `h` `j` `k` `l`, arrows | move |
+| `w` / `b` / `e` | next word / start of word / end of word |
 | `0` / `^` / `$` | start / start / end of line |
 | `g` / `G` | top of history / bottom |
 | `ctrl-u` `ctrl-b` / `ctrl-d` `ctrl-f`, PgUp / PgDn | page up / down |
@@ -58,8 +59,10 @@ and starts at the program's cursor. Moving past the top or bottom scrolls the hi
 | `y` / `Enter` | copy the selection to the clipboard and leave |
 | `q` / `Esc` / `ctrl-c` | leave without copying |
 
-A count before a motion repeats it (`5j`). Word motions (`w` `b` `e`) and search
-aren't available: Herdr only exposes cell, line and page moves for the selection.
+A count before a motion repeats it (`5j`, `3w`). Word motions follow vim's rules
+(letters, digits and `_` make a word; other punctuation runs are words too). They
+work on the terminal's text from `hc read`, so a word broken by a soft wrap is
+still one word. Search isn't available.
 
 ### Tab navigation
 
