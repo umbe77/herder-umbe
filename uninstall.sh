@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Remove every Herdr mod in ./mods from the Herdr config, and the key bindings
-# that install.sh added. Safe to run again: missing mods and bindings are skipped.
-# A binding is only removed while it still points at the action from ./keys.json,
-# so a key you have since rebound is left alone.
+# Remove every Herdr mod in ./mods and theme in ./themes from the Herdr config,
+# and the key bindings that install.sh added. Safe to run again: missing mods,
+# themes and bindings are skipped. A binding is only removed while it still
+# points at the action from ./keys.json, so a key you have since rebound is
+# left alone.
 #
 # Usage: ./uninstall.sh [--no-keys]
 #   --no-keys  leave keys.json alone
@@ -18,7 +19,7 @@ for arg in "$@"; do
   case "$arg" in
     --no-keys) KEYS=0 ;;
     -h | --help)
-      sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -38,6 +39,18 @@ for dir in "$REPO"/mods/*/; do
     echo "removed $name"
   else
     echo "not installed: $name"
+  fi
+done
+
+for file in "$REPO"/themes/*.json; do
+  [ -f "$file" ] || continue
+  name="$(basename "$file" .json)"
+  target="$DEST/themes/$name.json"
+  if [ -L "$target" ] || [ -e "$target" ]; then
+    rm -f "$target"
+    echo "removed theme $name"
+  else
+    echo "not installed: theme $name"
   fi
 done
 

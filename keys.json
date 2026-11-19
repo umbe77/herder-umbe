@@ -6,6 +6,8 @@
     "alt-,": "mod.open:umbe-settings",
     "shift-left": "tab.prev",
     "shift-right": "tab.next",
-    "alt-c": "mod.open:copy-mode"
+    "alt-c": "mod.open:copy-mode",
+    "alt-z": "mod.open:zen-mode",
+    "alt-g": "mod.open:git-graph-toggle"
   }
 }

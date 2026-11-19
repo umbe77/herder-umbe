@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Install (or reinstall) every Herdr mod in ./mods and merge the key bindings
-# from ./keys.json into the Herdr config. Safe to run again: mods that are
-# already installed are replaced, and bindings already present are kept as-is.
+# Install (or reinstall) every Herdr mod in ./mods and theme in ./themes, and
+# merge the key bindings from ./keys.json into the Herdr config. Safe to run
+# again: mods and themes already installed are replaced, and bindings already
+# present are kept as-is.
 #
 # Usage: ./install.sh [--copy] [--no-keys]
-#   --copy     copy the mod folders instead of symlinking them
+#   --copy     copy the mods and themes instead of symlinking them
 #   --no-keys  leave keys.json alone
 # HERDR_CONFIG overrides the config folder (default ~/.config/herdr-app).
 
@@ -20,7 +21,7 @@ for arg in "$@"; do
     --copy) MODE=copy ;;
     --no-keys) KEYS=0 ;;
     -h | --help)
-      sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *)
@@ -55,6 +56,24 @@ for dir in "$REPO"/mods/*/; do
   fi
   echo "$verb $name ($MODE)"
   installed+=("$name")
+done
+
+mkdir -p "$DEST/themes"
+for file in "$REPO"/themes/*.json; do
+  [ -f "$file" ] || continue
+  name="$(basename "$file" .json)"
+  target="$DEST/themes/$name.json"
+  verb=installed
+  if [ -L "$target" ] || [ -e "$target" ]; then
+    verb=reinstalled
+    rm -f "$target"
+  fi
+  if [ "$MODE" = copy ]; then
+    cp "$file" "$target"
+  else
+    ln -s "$file" "$target"
+  fi
+  echo "$verb theme $name ($MODE)"
 done
 
 if [ "${#installed[@]}" -eq 0 ]; then

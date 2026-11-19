@@ -1,0 +1,10 @@
+{
+  "place": "none",
+  "title": "Toggle git graph",
+  "overlay": {
+    "kind": "popup",
+    "at": "top",
+    "width": 1,
+    "height": 1
+  }
+}
