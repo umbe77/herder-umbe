@@ -35,7 +35,7 @@ README.md          user-facing docs for every mod, key and option
 | `choose-projects` | `alt-o` | fuzzy picker over the folders in `projects_dir`; opens a space with `IDE` (`nvim .`), `Terminal` and an agent tab |
 | `new-project` | `alt-n` | prompts for a name, creates `<projects_dir>/<name>`, opens it like `choose-projects` |
 | `switch-space` | `alt-s` | fuzzy switcher over the open spaces |
-| `close-space` | `alt-d` | fuzzy list of the open spaces; Enter arms a row, Enter again runs `space.close` |
+| `close-space` | `alt-d` | fuzzy list of the open spaces; Enter arms a row, Enter again runs `space.close`; Tab marks several, alt-a marks all |
 | `umbe-settings` | `alt-,` | edits `projects_dir` and `agent_cmd` in the config file |
 | `copy-mode` | `alt-c` | tmux `mode-keys vi` copy mode for the focused terminal |
 | `zen-mode` | `alt-z` | hides sidebar / tabs / status / panel; state per layout in `shared("zen-mode")` |

@@ -41,6 +41,12 @@ that toggles the git graph panel.
 - `Enter` or a click arms the row (marked `✕`); `Enter` or a click again closes
   that space and every terminal in it. Moving or typing disarms it.
 - The popup stays open so you can close several spaces; `Esc` exits.
+- `Tab` (or `Ctrl`-click) marks the highlighted row (`◆`) and moves down;
+  `Alt-A` marks every row that's visible now, or unmarks them all if they are
+  already marked. With no filter, that's every open space.
+- With rows marked, `Enter` arms all of them (red), and `Enter` again closes
+  them all at once, without Herdr asking once per space. Marks survive moving
+  and filtering, so you can filter, mark, filter again and mark more.
 
 ### `works-space` (`ctrl-n`)
 
