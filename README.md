@@ -1,8 +1,8 @@
 # herder-choose-projects
 
-Seven Herdr mods: a fuzzy project picker for the folders directly inside your
+Eight Herdr mods: a fuzzy project picker for the folders directly inside your
 projects folder (`~/develop` by default), a prompt that creates a new project
-there, a fuzzy switcher for the spaces you have open, a settings popup, a
+there, a fuzzy switcher for the spaces you have open, a picker that closes them, a settings popup, a
 tmux-style copy mode with vi keys, a zen mode that hides every bar, and a key
 that toggles the git graph panel.
 
@@ -33,6 +33,13 @@ that toggles the git graph panel.
 - Lists every open space (the active one is marked `●`), with its tab count.
 - Type to fuzzy-filter by space name, then `Enter` or click to switch.
   `Esc` closes.
+
+### `close-space` (`alt-d`)
+
+- Lists every open space, like `switch-space`; type to fuzzy-filter by name.
+- `Enter` or a click arms the row (marked `✕`); `Enter` or a click again closes
+  that space and every terminal in it. Moving or typing disarms it.
+- The popup stays open so you can close several spaces; `Esc` exits.
 
 ### `umbe-settings` (`alt-,`)
 
@@ -153,6 +160,7 @@ The bindings it adds (under `global`):
 "alt-c": "mod.open:copy-mode",
 "alt-z": "mod.open:zen-mode",
 "alt-g": "mod.open:git-graph-toggle",
+"alt-d": "mod.open:close-space",
 "shift-left": "tab.prev",
 "shift-right": "tab.next"
 ```
