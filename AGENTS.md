@@ -40,6 +40,7 @@ README.md          user-facing docs for every mod, key and option
 | `copy-mode` | `alt-c` | tmux `mode-keys vi` copy mode for the focused terminal |
 | `zen-mode` | `alt-z` | hides sidebar / tabs / status / panel; state per layout in `shared("zen-mode")` |
 | `git-graph-toggle` | `alt-g` | opens/closes the right panel on the git graph |
+| `works-space` | `ctrl-n` | selects the `works` space, or creates it in `~` with two terminal tabs; moves it to the top |
 
 `keys.json` also binds `shift-left` / `shift-right` to `tab.prev` / `tab.next`.
 

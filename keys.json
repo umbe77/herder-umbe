@@ -9,6 +9,7 @@
     "alt-c": "mod.open:copy-mode",
     "alt-z": "mod.open:zen-mode",
     "alt-g": "mod.open:git-graph-toggle",
-    "alt-d": "mod.open:close-space"
+    "alt-d": "mod.open:close-space",
+    "ctrl-n": "mod.open:works-space"
   }
 }
