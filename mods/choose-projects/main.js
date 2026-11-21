@@ -2,13 +2,14 @@
 // otherwise, see config.js). On Enter: a space named after the folder,
 // with an "IDE" tab running `nvim .`, a "Terminal" tab with a shell and an
 // agent tab running `agent_cmd` (`claude` by default, tab named after the
-// command). The IDE tab stays active.
+// command). The IDE tab stays active. Folders that already have an open
+// space (same folder, on this machine) are not listed.
 
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, ScrollHandle } from "gpui-base";
 import { props, closeOverlay, run, spaces, theme, notify } from "herdr";
 
-import { loadConfig, agentArgv, agentTabName, DEFAULT_AGENT_CMD, listDirs, tildify, DEFAULT_PROJECTS_DIR } from "./config.js";
+import { loadConfig, agentArgv, agentTabName, DEFAULT_AGENT_CMD, listDirs, tildify, expandHome, DEFAULT_PROJECTS_DIR } from "./config.js";
 
 // Subsequence match, ranked: word starts and runs of adjacent letters win.
 function fuzzy(query, name) {
@@ -77,10 +78,26 @@ export default class ChooseProjects extends View {
     closeOverlay(props()?.overlay);
   }
 
+  // Folders of the spaces open on this machine.
+  openFolders() {
+    return new Set(
+      spaces()
+        .filter((space) => space.machine === null && space.folder)
+        .map((space) => expandHome(space.folder)),
+    );
+  }
+
+  // Project folders without an open space.
+  closedDirs() {
+    const open = this.openFolders();
+    return this.dirs.filter((name) => !open.has(`${this.root}/${name}`));
+  }
+
   matches() {
+    const dirs = this.closedDirs();
     const query = this.query.trim();
-    if (!query) return this.dirs.map((name) => ({ name }));
-    return this.dirs
+    if (!query) return dirs.map((name) => ({ name }));
+    return dirs
       .map((name) => {
         const score = fuzzy(query, name);
         return score === null ? null : { name, score };
@@ -218,7 +235,12 @@ export default class ChooseProjects extends View {
         .when(this.loading, (el) => el.items_center().justify_center().child(div().text_color(t.dim).child("Loading…")))
         .when(!this.loading && list.length === 0, (el) =>
           el.items_center().justify_center().child(
-            div().text_color(t.dim).child(this.error || (this.query ? "No matching folders" : `No folders in ${tildify(this.root)}`)),
+            div().text_color(t.dim).child(this.error ||
+                (this.query
+                  ? "No matching folders"
+                  : this.dirs.length
+                    ? "All projects are already open"
+                    : `No folders in ${tildify(this.root)}`),),
           ),
         )
         .children(list.map(row));

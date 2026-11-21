@@ -32,7 +32,7 @@ README.md          user-facing docs for every mod, key and option
 
 | Mod | Key | What it does |
 |---|---|---|
-| `choose-projects` | `alt-o` | fuzzy picker over the folders in `projects_dir`; opens a space with `IDE` (`nvim .`), `Terminal` and an agent tab |
+| `choose-projects` | `alt-o` | fuzzy picker over the folders in `projects_dir` not already open as a space; opens a space with `IDE` (`nvim .`), `Terminal` and an agent tab |
 | `new-project` | `alt-n` | prompts for a name, creates `<projects_dir>/<name>`, opens it like `choose-projects` |
 | `switch-space` | `alt-s` | fuzzy switcher over the open spaces |
 | `close-space` | `alt-d` | fuzzy list of the open spaces; Enter arms a row, Enter again runs `space.close`; Tab marks several, alt-a marks all |

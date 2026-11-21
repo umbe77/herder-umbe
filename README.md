@@ -13,6 +13,7 @@ that toggles the git graph panel.
 
 - Type to fuzzy-filter the folders in the projects folder (immediate subdirectories,
   hidden folders skipped).
+- Folders that already have an open space are hidden — use `switch-space` to go to them.
 - Use `↑` / `↓` and `Enter`, click a row, or press `Esc` to close.
 - Choosing a folder creates a space named after it, with three tabs:
   - `IDE` — runs `nvim .`
